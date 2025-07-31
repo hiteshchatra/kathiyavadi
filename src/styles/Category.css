@@ -1,0 +1,212 @@
+/* Category Section - Minimal & Compact */
+.category-section {
+  margin-bottom: var(--space-8);
+  opacity: 0;
+  transform: translateY(15px);
+  transition: all 0.5s ease-out;
+}
+
+.category-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Category Header - Minimal Line Style */
+.category-header {
+  margin-bottom: var(--space-4);
+  position: relative;
+}
+
+.category-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 2px solid var(--gray-200);
+  position: relative;
+  transition: var(--transition-all);
+}
+
+.category-title-wrapper::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gradient-primary);
+  transition: width 0.3s ease-out;
+}
+
+.category-title-wrapper:hover::after {
+  width: 60px;
+}
+
+/* Category Icon - Small & Simple */
+.category-icon {
+  font-size: 1.3rem;
+  color: var(--accent);
+  transition: var(--transition-all);
+}
+
+.category-title-wrapper:hover .category-icon {
+  transform: scale(1.1);
+  color: var(--accent-dark);
+}
+
+/* Category Title - Clean & Simple */
+.category-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  flex: 1;
+}
+
+/* Category Count - Minimal Badge */
+.category-count {
+  font-size: 0.75rem;
+  color: var(--text-light);
+  font-weight: 500;
+  padding: var(--space-1) var(--space-2);
+  background: var(--gray-100);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-all);
+}
+
+.category-title-wrapper:hover .category-count {
+  background: var(--accent);
+  color: var(--white);
+}
+
+/* Menu Items List - Clean Grid */
+.menu-items-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+}
+
+/* Responsive Grid - Compact */
+@media (min-width: 640px) {
+  .category-title {
+    font-size: 1.3rem;
+  }
+  
+  .category-icon {
+    font-size: 1.4rem;
+  }
+  
+  .menu-items-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .category-section {
+    margin-bottom: var(--space-10);
+  }
+}
+
+@media (min-width: 1024px) {
+  .menu-items-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .menu-items-list > *:not(:nth-child(3n)) {
+    border-right: 1px solid var(--gray-200);
+  }
+}
+
+@media (min-width: 1280px) {
+  .menu-items-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .menu-items-list > *:not(:nth-child(4n)) {
+    border-right: 1px solid var(--gray-200);
+  }
+}
+
+/* Remove conflicting borders */
+.menu-items-list > *:nth-child(odd) {
+  border-right: none;
+}
+
+@media (min-width: 640px) {
+  .menu-items-list > *:nth-child(2n-1) {
+    border-right: 1px solid var(--gray-200);
+  }
+}
+
+@media (min-width: 1024px) {
+  .menu-items-list > *:nth-child(2n-1) {
+    border-right: none;
+  }
+  
+  .menu-items-list > *:not(:nth-child(3n)) {
+    border-right: 1px solid var(--gray-200);
+  }
+}
+
+@media (min-width: 1280px) {
+  .menu-items-list > *:not(:nth-child(3n)) {
+    border-right: none;
+  }
+  
+  .menu-items-list > *:not(:nth-child(4n)) {
+    border-right: 1px solid var(--gray-200);
+  }
+}
+
+/* Animation Effects */
+@keyframes categorySlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.category-section.visible .category-title-wrapper {
+  animation: categorySlideIn 0.4s ease-out forwards;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .category-section,
+  .category-icon {
+    animation: none;
+    transition: none;
+  }
+  
+  .category-section.visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .category-section {
+    break-inside: avoid;
+    margin-bottom: 1rem;
+  }
+  
+  .category-title-wrapper {
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .menu-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+}
