@@ -1,0 +1,100 @@
+.categories-dropdown-wrapper {
+  position: relative;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .categories-dropdown-wrapper {
+    display: block;
+    margin-left: 1.5rem;
+  }
+}
+
+.categories-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--gray-100);
+  color: var(--text-primary);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-full);
+  padding: 0.5rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-all);
+  box-shadow: var(--shadow-xs);
+}
+
+.categories-dropdown-btn:hover,
+.categories-dropdown-btn:focus {
+  background: var(--accent-light);
+  color: var(--white);
+  border-color: var(--accent);
+}
+
+.categories-dropdown-menu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  left: auto;
+  min-width: 220px;
+  max-width: 95vw;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+  overflow-x: auto;
+}
+
+.categories-dropdown-list {
+  max-height: 16.5rem; /* ~6 items at 44px each */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.categories-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1.25rem;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-all);
+  text-align: left;
+}
+
+.categories-dropdown-item:hover,
+.categories-dropdown-item.active {
+  background: var(--accent-light);
+  color: var(--white);
+}
+
+.categories-dropdown-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.categories-dropdown-text {
+  flex: 1;
+  font-weight: 500;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

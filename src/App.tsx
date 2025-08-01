@@ -5,9 +5,15 @@ import CategoryNav from './components/CategoryNav';
 import SearchBar from './components/SearchBar';
 import SearchResults from './components/SearchResults';
 import LoadingSpinner from './components/LoadingSpinner';
+import { fetchCategories, fetchMenuItems, fetchRestaurantInfo, transformFirebaseDataToMenu, Restaurant } from './firebase/firebaseService';
+import { debugDatabaseStructure } from './firebase/debugService';
+import { findAllRestaurantIds } from './firebase/findRestaurantId';
+import { APP_CONFIG } from './config/app';
 import './styles/App.css';
 
-const menu = [
+// Fallback static menu data (commented out - now using Firebase data)
+/*
+const fallbackMenu = [
   {
     id: "cat1",
     name: "Appetizers",
@@ -554,15 +560,20 @@ const menu = [
     ]
   }
 ];
+*/
 
-const restaurantInfo = {
+// Empty fallback menu - now using Firebase data only
+const fallbackMenu: any[] = [];
+
+// Fallback restaurant info
+const fallbackRestaurantInfo = {
   name: "કાઠિયાવાડી",
   tagline: "ગુજરાતી, પંજાબી, દાલબાટી, પરાઠા",
   tagline2: "Gujarati, Punjabi, Dalbati, Paratha",
   logo: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=200",
   heroImage: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1200",
-  phone: "+91 98765 43210",
-  address: "123 Food Street, Gourmet District"
+  phone: "+91 63765 35219",
+  address: "Gujarat High Court, Vishwas City 1, Sola, Ahmedabad"
 };
 
 function App() {
@@ -570,34 +581,86 @@ function App() {
   const [activeCategory, setActiveCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [menu, setMenu] = useState(fallbackMenu);
+  const [restaurantInfo, setRestaurantInfo] = useState(fallbackRestaurantInfo);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
-  // Create a flat list of all menu items with category info for searching (memoized once)
+  // Restaurant ID from configuration
+  const RESTAURANT_ID = APP_CONFIG.RESTAURANT_ID;
+
+  // Load data from Firebase
+  useEffect(() => {
+    const loadFirebaseData = async () => {
+      try {
+        setIsLoading(true);
+        // Fetch data from Firebase
+        const [categories, menuItems, restaurantData] = await Promise.all([
+          fetchCategories(RESTAURANT_ID),
+          fetchMenuItems(RESTAURANT_ID),
+          fetchRestaurantInfo(RESTAURANT_ID)
+        ]);
+
+        // Transform Firebase data to match your existing structure
+        if (categories.length > 0 && menuItems.length > 0) {
+          const transformedMenu = transformFirebaseDataToMenu(categories, menuItems);
+          setMenu(transformedMenu);
+          setDataLoaded(true);
+        }
+
+        // Update restaurant info if available
+        if (restaurantData) {
+          setRestaurantInfo({
+            name: restaurantData.name || fallbackRestaurantInfo.name,
+            tagline: restaurantData.tagline || fallbackRestaurantInfo.tagline,
+            tagline2: restaurantData.tagline2 || fallbackRestaurantInfo.tagline2,
+            phone: restaurantData.phone || fallbackRestaurantInfo.phone,
+            address: restaurantData.address || fallbackRestaurantInfo.address,
+            logo: restaurantData.logo || fallbackRestaurantInfo.logo,
+            heroImage: restaurantData.heroImage || fallbackRestaurantInfo.heroImage
+          });
+        }
+
+      } catch (error) {
+        console.error('Error loading Firebase data:', error);
+        // Keep fallback data if Firebase fails
+      } finally {
+        // Simulate loading time for better UX
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000);
+      }
+    };
+
+    loadFirebaseData();
+  }, [RESTAURANT_ID]);
+
+  // Create a flat list of all menu items with category info for searching
   const allMenuItems = useMemo(() => {
-    return menu.flatMap(category => 
+    return menu.flatMap(category =>
       category.items.map(item => ({
         ...item,
         categoryName: category.name,
         categoryIcon: category.icon
       }))
     );
-  }, []); // Empty dependency array since menu is static
+  }, [menu]);
 
   // Reorder categories based on selected category
   const orderedCategories = useMemo(() => {
     if (!selectedCategory) return menu;
-    
+
     const selectedCat = menu.find(cat => cat.id === selectedCategory);
     const otherCats = menu.filter(cat => cat.id !== selectedCategory);
-    
+
     return selectedCat ? [selectedCat, ...otherCats] : menu;
-  }, [selectedCategory]);
+  }, [selectedCategory, menu]);
 
   // Filter items based on search query (optimized)
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];
-    
+
     const query = searchQuery.toLowerCase().trim();
-    return allMenuItems.filter(item => 
+    return allMenuItems.filter(item =>
       item.name.toLowerCase().includes(query) ||
       item.description?.toLowerCase().includes(query) ||
       item.categoryName.toLowerCase().includes(query)
@@ -655,35 +718,35 @@ function App() {
 
   return (
     <div className="app">
-      <Header 
+      <Header
         restaurantInfo={restaurantInfo}
         categories={menu}
         activeCategory={activeCategory}
       />
-      
+
       <main className="main-content">
         <div className="menu-container">
           <SearchBar onSearch={handleSearch} />
-          
+
           {searchQuery ? (
-            <SearchResults 
+            <SearchResults
               query={searchQuery}
               results={searchResults}
               isSearching={false}
             />
           ) : (
             <>
-              <CategoryNav 
+              <CategoryNav
                 categories={menu}
                 activeCategory={selectedCategory || activeCategory}
                 onCategoryClick={handleCategoryClick}
               />
-              
+
               {orderedCategories.map((category, index) => (
                 category.items.length > 0 && (
-                  <Category 
-                    key={category.id} 
-                    category={category} 
+                  <Category
+                    key={category.id}
+                    category={category}
                     animationDelay={index * 0.1}
                   />
                 )
@@ -692,23 +755,81 @@ function App() {
           )}
         </div>
       </main>
-      
+
       <footer className="footer">
         <div className="footer-content">
-          <div className="footer-brand">
-            <h3>{restaurantInfo.name}</h3>
-            <p className="footer-tagline">{restaurantInfo.tagline}</p>
-          </div>
-          <div className="footer-info">
-            <div className="footer-contact">
-              <p>{restaurantInfo.address}</p>
-              <p>{restaurantInfo.phone}</p>
+          {/* Contact Information */}
+          <div className="footer-contact-section">
+            <h4 className="footer-section-title">Contact Us</h4>
+            <div className="footer-contact-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="footer-icon">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              <span>{restaurantInfo.address}</span>
+            </div>
+            <div className="footer-contact-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="footer-icon">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+              <a href={`tel:${restaurantInfo.phone.replace(/[^\d+]/g, '')}`} style={{ color: 'inherit', textDecoration: 'none' }}>{restaurantInfo.phone}</a>
             </div>
           </div>
-          <div className="footer-bottom">
-            <p>&copy; 2025 {restaurantInfo.name}. All rights reserved.</p>
-            <p className="footer-love">Crafted with ❤️ for food lovers</p>
+
+          {/* Action Buttons */}
+          <div className="footer-actions-section">
+            <div className="footer-buttons">
+              <a
+                href="https://maps.app.goo.gl/vztXTynWqZ7C1nbx7"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-action-btn"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span>Get Directions</span>
+              </a>
+              <a
+                href="https://www.google.com/maps/place/Om+Kathiyawadi/@23.079501,72.526994,19z/data=!4m6!3m5!1s0x395e8300035acdfd:0x46bc5c14fe47370e!8m2!3d23.0794492!4d72.5266068!16s%2Fg%2F11vwpg2x08?hl=en-US&entry=ttu&g_ep=EgoyMDI1MDcyOS4wIKXMDSoASAFQAw%3D%3D"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-action-btn"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"></polygon>
+                </svg>
+                <span>Write Review</span>
+              </a>
+            </div>
           </div>
+
+          {/* Made by Quick Menus */}
+          <div className="footer-branding-section">
+            <div className="footer-made-by">
+              <span className="footer-made-text">Made by</span>
+              <a
+                href="https://quickmenus.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-brand-logo"
+                style={{ textDecoration: 'none', cursor: 'pointer' }}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="footer-brand-icon">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="9" cy="9" r="2"></circle>
+                  <path d="M21 15.5c-1-1.5-3-2.5-5-2.5s-4 1-5 2.5"></path>
+                </svg>
+                <span className="footer-brand-name">Quick Menus</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Bottom */}
+        <div className="footer-bottom">
+          <p>&copy; {new Date().getFullYear()} {restaurantInfo.name}. All rights reserved.</p>
         </div>
       </footer>
     </div>

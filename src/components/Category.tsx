@@ -57,7 +57,25 @@ const Category: React.FC<CategoryProps> = ({ category, animationDelay }) => {
     >
       <div className="category-header">
         <div className="category-title-wrapper">
-          <span className="category-icon">{category.icon}</span>
+          {category.icon === 'image' && category.image ? (
+            <img 
+              src={category.image} 
+              alt={category.name}
+              className="category-icon-image"
+              onError={(e) => {
+                // If image fails to load, show emoji fallback
+                e.currentTarget.style.display = 'none';
+                const fallbackIcon = e.currentTarget.nextElementSibling as HTMLElement;
+                if (fallbackIcon) fallbackIcon.style.display = 'inline';
+              }}
+            />
+          ) : null}
+          <span 
+            className="category-icon"
+            style={{ display: category.icon === 'image' && category.image ? 'none' : 'inline' }}
+          >
+            {category.icon === 'image' ? '🍽️' : category.icon}
+          </span>
           <h2 className="category-title">{category.name}</h2>
           <span className="category-count">{category.items.length}</span>
         </div>

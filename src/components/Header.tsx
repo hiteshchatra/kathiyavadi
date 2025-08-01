@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChefHat, Menu, X, MapPin, Phone, Star } from 'lucide-react';
+import CategoriesDropdown from './CategoriesDropdown';
 import '../styles/Header.css';
 
 interface HeaderProps {
@@ -17,6 +18,7 @@ interface HeaderProps {
     id: string;
     name: string;
     icon?: string;
+    image?: string;
     items: any[];
   }>;
   activeCategory: string;
@@ -126,19 +128,9 @@ const Header: React.FC<HeaderProps> = ({ restaurantInfo, categories, activeCateg
             <span className="nav-title">{restaurantInfo.name}</span>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="nav-menu">
-            {categories.filter(cat => cat.items.length > 0).map((category) => (
-              <button
-                key={category.id}
-                className={`nav-item ${activeCategory === category.id ? 'active' : ''}`}
-                onClick={() => scrollToCategory(category.id)}
-              >
-                <span className="nav-item-icon">{category.icon}</span>
-                <span className="nav-item-text">{category.name}</span>
-                <div className="nav-item-indicator"></div>
-              </button>
-            ))}
+          {/* Desktop Navigation: Categories Dropdown */}
+          <div className="categories-dropdown-desktop">
+            <CategoriesDropdown categories={categories} activeCategory={activeCategory} scrollToCategory={scrollToCategory} />
           </div>
 
           {/* Mobile Menu Button */}
@@ -162,7 +154,23 @@ const Header: React.FC<HeaderProps> = ({ restaurantInfo, categories, activeCateg
                 onClick={() => scrollToCategory(category.id)}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <span className="mobile-nav-icon">{category.icon}</span>
+                <span className="mobile-nav-icon">
+                  {category.icon === 'image' && category.image ? (
+                    <img 
+                      src={category.image} 
+                      alt={category.name}
+                      className="mobile-nav-icon-image"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'inline';
+                      }}
+                    />
+                  ) : null}
+                  <span style={{ display: category.icon === 'image' && category.image ? 'none' : 'inline' }}>
+                    {category.icon === 'image' ? '🍽️' : category.icon}
+                  </span>
+                </span>
                 <span className="mobile-nav-text">{category.name}</span>
                 <div className="mobile-nav-indicator"></div>
               </button>
