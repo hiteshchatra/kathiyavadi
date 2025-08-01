@@ -563,14 +563,14 @@ const fallbackMenu = [
 */
 
 // Empty fallback menu - now using Firebase data only
-const fallbackMenu: any[] = [];
+const fallbackMenu: unknown[] = [];
 
 // Fallback restaurant info
 const fallbackRestaurantInfo = {
   name: "કાઠિયાવાડી",
   tagline: "ગુજરાતી, પંજાબી, દાલબાટી, પરાઠા",
   tagline2: "Gujarati, Punjabi, Dalbati, Paratha",
-  logo: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=200",
+  logo: "/assets/img/logo.png",
   heroImage: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1200",
   phone: "+91 63765 35219",
   address: "Gujarat High Court, Vishwas City 1, Sola, Ahmedabad"
@@ -713,7 +713,7 @@ function App() {
   }, []);
 
   if (isLoading) {
-    return <LoadingSpinner restaurantName={restaurantInfo.name} />;
+    return <LoadingSpinner restaurantName={restaurantInfo.name} logo={restaurantInfo.logo} />;
   }
 
   return (

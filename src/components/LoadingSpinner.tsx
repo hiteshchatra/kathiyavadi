@@ -1,12 +1,12 @@
 import React from 'react';
-import { ChefHat } from 'lucide-react';
 import '../styles/LoadingSpinner.css';
 
 interface LoadingSpinnerProps {
   restaurantName: string;
+  logo: string;
 }
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ restaurantName }) => {
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ restaurantName, logo }) => {
   return (
     <div className="loading-container">
       <div className="loading-background">
@@ -17,7 +17,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ restaurantName }) => {
       <div className="loading-content">
         <div className="loading-logo">
           <div className="logo-container">
-            <ChefHat className="loading-icon" />
+            <img src={logo} alt={restaurantName} className="loading-icon" />
             <div className="logo-rings">
               <div className="ring ring-1"></div>
               <div className="ring ring-2"></div>

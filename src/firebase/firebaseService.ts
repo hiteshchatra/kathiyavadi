@@ -23,8 +23,8 @@ export interface MenuItem {
   categoryName: string;
   available: boolean;
   featured: boolean;
-  createdAt: any;
-  updatedAt: any;
+  createdAt: unknown;
+  updatedAt: unknown;
 }
 
 export interface Restaurant {
@@ -227,7 +227,6 @@ const getSmartEmojiForCategory = (categoryName: string): string => {
     'chinese': '🥢',
     'indo chinese': '🥢',
     'indo-chinese': '🥢',
-    'noodles': '🍜',
     'chow mein': '🍜',
     'hakka': '🥢',
     
@@ -299,7 +298,6 @@ const getSmartEmojiForCategory = (categoryName: string): string => {
     // Breakfast
     'breakfast': '🍳',
     'morning': '🌅',
-    'paratha': '🥖',
     'poha': '🍚',
     'upma': '🥣',
     'dosa': '🥞',

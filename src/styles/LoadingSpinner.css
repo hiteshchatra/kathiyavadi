@@ -81,19 +81,22 @@
 
 .logo-container {
   position: relative;
-  display: inline-block;
+  width: 180px;
+  height: 180px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: var(--shadow-lg);
+  animation: scaleIn 0.6s ease-out 0.2s both;
+  z-index: 10;
 }
 
 .loading-icon {
-  width: 90px;
-  height: 90px;
-  color: var(--white);
-  background: var(--gradient-primary);
-  padding: var(--space-6);
-  border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-2xl), var(--shadow-glow);
-  animation: iconPulse 2s ease-in-out infinite;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  width: 120px !important;
+  height: 120px !important;
+  object-fit: contain;
 }
 
 @keyframes logoFloat {
@@ -130,26 +133,26 @@
 }
 
 .ring-1 {
-  width: 120px;
-  height: 120px;
-  top: -60px;
-  left: -60px;
-  animation-delay: 0s;
-}
-
-.ring-2 {
   width: 140px;
   height: 140px;
   top: -70px;
   left: -70px;
-  animation-delay: 1s;
+  animation-delay: 0s;
 }
 
-.ring-3 {
+.ring-2 {
   width: 160px;
   height: 160px;
   top: -80px;
   left: -80px;
+  animation-delay: 1s;
+}
+
+.ring-3 {
+  width: 180px;
+  height: 180px;
+  top: -90px;
+  left: -90px;
   animation-delay: 2s;
 }
 
@@ -313,10 +316,14 @@
 
 /* Responsive Design */
 @media (min-width: 640px) {
+  .logo-container {
+    width: 120px;
+    height: 120px;
+  }
+  
   .loading-icon {
-    width: 100px;
-    height: 100px;
-    padding: var(--space-8);
+    width: 80px;
+    height: 80px;
   }
   
   .loading-title {
@@ -364,7 +371,7 @@
 @media (prefers-reduced-motion: reduce) {
   .loading-pattern,
   .loading-logo,
-  .loading-icon,
+  .logo-container,
   .ring,
   .progress-fill,
   .dot {

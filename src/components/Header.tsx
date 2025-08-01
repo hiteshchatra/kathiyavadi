@@ -74,7 +74,7 @@ const Header: React.FC<HeaderProps> = ({ restaurantInfo, categories, activeCateg
         <div className="hero-content">
           <div className="hero-logo">
             <div className="logo-circle">
-              <ChefHat className="logo-icon" />
+              <img src={restaurantInfo.logo} alt={restaurantInfo.name} className="logo-icon" />
             </div>
             <div className="logo-rings">
               <div className="ring ring-1"></div>
@@ -123,7 +123,7 @@ const Header: React.FC<HeaderProps> = ({ restaurantInfo, categories, activeCateg
         <div className="nav-container">
           <div className="nav-brand">
             <div className="nav-logo">
-              <ChefHat className="nav-icon" />
+              <img src={restaurantInfo.logo} alt={restaurantInfo.name} className="nav-icon" />
             </div>
             <span className="nav-title">{restaurantInfo.name}</span>
           </div>

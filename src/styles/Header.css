@@ -64,9 +64,8 @@
 
 .logo-circle {
   position: relative;
-  width: 80px;
-  height: 80px;
-  background: var(--gradient-primary);
+  width: 120px;
+  height: 120px;
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
@@ -78,10 +77,9 @@
 }
 
 .logo-icon {
-  width: 40px;
-  height: 40px;
-  color: var(--white);
-  animation: float 3s ease-in-out infinite 0.5s;
+  width: 180px !important;
+  height: 180px !important;
+  object-fit: contain;
 }
 
 .logo-rings {
@@ -385,9 +383,8 @@
 }
 
 .nav-logo {
-  width: 32px;
-  height: 32px;
-  background: var(--gradient-primary);
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
@@ -400,9 +397,9 @@
 }
 
 .nav-icon {
-  width: 18px;
-  height: 18px;
-  color: var(--white);
+  width: 44px !important;
+  height: 44px !important;
+  object-fit: contain;
 }
 
 .nav-title {
@@ -678,13 +675,13 @@
   }
   
   .logo-circle {
-    width: 70px;
-    height: 70px;
+    width: 100px;
+    height: 100px;
   }
   
   .logo-icon {
-    width: 35px;
-    height: 35px;
+    width: 70px;
+    height: 70px;
   }
   
   .ring-1 {
@@ -743,13 +740,13 @@
   }
   
   .nav-logo {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
   }
   
   .nav-icon {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
   }
   
   .nav-title {
@@ -775,13 +772,13 @@
   }
   
   .logo-circle {
-    width: 90px;
-    height: 90px;
+    width: 120px;
+    height: 120px;
   }
   
   .logo-icon {
-    width: 45px;
-    height: 45px;
+    width: 80px;
+    height: 80px;
   }
   
   .hero-tagline {
