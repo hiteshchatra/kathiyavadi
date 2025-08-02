@@ -15,7 +15,7 @@ export const APP_CONFIG = {
   
   // Default fallback values
   FALLBACK_DATA: {
-    RESTAURANT_NAME: "કાઠિયાવાડી",
+    RESTAURANT_NAME: "કાઠીયાવાડી",
     RESTAURANT_TAGLINE: "ગુજરાતી, પંજાબી, દાલબાટી, પરાઠા",
     RESTAURANT_PHONE: "+91 63765 35219",
     RESTAURANT_ADDRESS: "Gujarat High Court, Vishwas City 1, Sola, Ahmedabad"

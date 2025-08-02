@@ -567,7 +567,7 @@ const fallbackMenu: unknown[] = [];
 
 // Fallback restaurant info
 const fallbackRestaurantInfo = {
-  name: "કાઠિયાવાડી",
+  name: "કાઠીયાવાડી",
   tagline: "ગુજરાતી, પંજાબી, દાલબાટી, પરાઠા",
   tagline2: "Gujarati, Punjabi, Dalbati, Paratha",
   logo: "/assets/img/logo.png",
