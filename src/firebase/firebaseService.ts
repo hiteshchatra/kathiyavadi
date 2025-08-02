@@ -38,6 +38,82 @@ export interface Restaurant {
   heroImage?: string;
 }
 
+// Fetch priority categories first (for immediate display)
+export const fetchPriorityCategories = async (restaurantId: string, limit: number = 2): Promise<Category[]> => {
+  try {
+    if (!db) {
+      return [];
+    }
+
+    const categoriesRef = collection(db, 'users', restaurantId, 'categories');
+    const q = query(categoriesRef, orderBy('order', 'asc'));
+    const querySnapshot = await getDocs(q);
+    
+    const categories: Category[] = [];
+    let count = 0;
+    
+    querySnapshot.forEach((doc) => {
+      if (count < limit) {
+        const data = doc.data();
+        categories.push({
+          id: doc.id,
+          name: data.name,
+          description: data.description || '',
+          image: data.image || '',
+          order: data.order || 0,
+          visible: data.visible !== false,
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt
+        });
+        count++;
+      }
+    });
+
+    return categories.filter(cat => cat.visible);
+  } catch (error) {
+    console.error('Error fetching priority categories:', error);
+    return [];
+  }
+};
+
+// Fetch remaining categories (after priority ones)
+export const fetchRemainingCategories = async (restaurantId: string, skipCount: number = 2): Promise<Category[]> => {
+  try {
+    if (!db) {
+      return [];
+    }
+
+    const categoriesRef = collection(db, 'users', restaurantId, 'categories');
+    const q = query(categoriesRef, orderBy('order', 'asc'));
+    const querySnapshot = await getDocs(q);
+    
+    const categories: Category[] = [];
+    let count = 0;
+    
+    querySnapshot.forEach((doc) => {
+      if (count >= skipCount) {
+        const data = doc.data();
+        categories.push({
+          id: doc.id,
+          name: data.name,
+          description: data.description || '',
+          image: data.image || '',
+          order: data.order || 0,
+          visible: data.visible !== false,
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt
+        });
+      }
+      count++;
+    });
+
+    return categories.filter(cat => cat.visible);
+  } catch (error) {
+    console.error('Error fetching remaining categories:', error);
+    return [];
+  }
+};
+
 // Fetch categories for a specific restaurant
 export const fetchCategories = async (restaurantId: string): Promise<Category[]> => {
   try {
@@ -64,6 +140,43 @@ export const fetchCategories = async (restaurantId: string): Promise<Category[]>
     return categories;
   } catch (error) {
     console.error('Error fetching categories:', error);
+    return [];
+  }
+};
+
+// Fetch menu items for specific categories (for progressive loading)
+export const fetchMenuItemsForCategories = async (restaurantId: string, categoryIds: string[]): Promise<MenuItem[]> => {
+  try {
+    if (!db || categoryIds.length === 0) {
+      return [];
+    }
+
+    const menuItemsRef = collection(db, 'users', restaurantId, 'menuItems');
+    const querySnapshot = await getDocs(menuItemsRef);
+    
+    const menuItems: MenuItem[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (categoryIds.includes(data.categoryId) && data.available === true) {
+        menuItems.push({
+          id: doc.id,
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          image: data.image,
+          categoryId: data.categoryId,
+          categoryName: data.categoryName,
+          available: data.available,
+          featured: data.featured,
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt
+        });
+      }
+    });
+    
+    return menuItems;
+  } catch (error) {
+    console.error('Error fetching menu items for categories:', error);
     return [];
   }
 };

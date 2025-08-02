@@ -5,7 +5,7 @@ import CategoryNav from './components/CategoryNav';
 import SearchBar from './components/SearchBar';
 import SearchResults from './components/SearchResults';
 import LoadingSpinner from './components/LoadingSpinner';
-import { fetchCategories, fetchMenuItems, fetchRestaurantInfo, transformFirebaseDataToMenu, Restaurant } from './firebase/firebaseService';
+import { fetchCategories, fetchMenuItems, fetchRestaurantInfo, transformFirebaseDataToMenu, fetchPriorityCategories, fetchRemainingCategories, fetchMenuItemsForCategories } from './firebase/firebaseService';
 import { debugDatabaseStructure } from './firebase/debugService';
 import { findAllRestaurantIds } from './firebase/findRestaurantId';
 import { APP_CONFIG } from './config/app';
@@ -578,36 +578,30 @@ const fallbackRestaurantInfo = {
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [activeCategory, setActiveCategory] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [menu, setMenu] = useState(fallbackMenu);
+  const [menu, setMenu] = useState<any[]>(fallbackMenu);
   const [restaurantInfo, setRestaurantInfo] = useState(fallbackRestaurantInfo);
-  const [dataLoaded, setDataLoaded] = useState(false);
+  const [hasMoreContent, setHasMoreContent] = useState(true);
 
   // Restaurant ID from configuration
   const RESTAURANT_ID = APP_CONFIG.RESTAURANT_ID;
 
-  // Load data from Firebase
+  // Progressive loading: Load priority content first, then remaining content
   useEffect(() => {
-    const loadFirebaseData = async () => {
+    const loadProgressiveData = async () => {
       try {
         setIsLoading(true);
-        // Fetch data from Firebase
-        const [categories, menuItems, restaurantData] = await Promise.all([
-          fetchCategories(RESTAURANT_ID),
-          fetchMenuItems(RESTAURANT_ID),
-          fetchRestaurantInfo(RESTAURANT_ID)
+        
+        // Phase 1: Load restaurant info and priority categories immediately
+        const [restaurantData, priorityCategories] = await Promise.all([
+          fetchRestaurantInfo(RESTAURANT_ID),
+          fetchPriorityCategories(RESTAURANT_ID, 2) // Load first 2 categories
         ]);
 
-        // Transform Firebase data to match your existing structure
-        if (categories.length > 0 && menuItems.length > 0) {
-          const transformedMenu = transformFirebaseDataToMenu(categories, menuItems);
-          setMenu(transformedMenu);
-          setDataLoaded(true);
-        }
-
-        // Update restaurant info if available
+        // Update restaurant info immediately
         if (restaurantData) {
           setRestaurantInfo({
             name: restaurantData.name || fallbackRestaurantInfo.name,
@@ -620,18 +614,80 @@ function App() {
           });
         }
 
-      } catch (error) {
-        console.error('Error loading Firebase data:', error);
-        // Keep fallback data if Firebase fails
-      } finally {
-        // Simulate loading time for better UX
-        setTimeout(() => {
+        // Phase 2: Load menu items for priority categories
+        if (priorityCategories.length > 0) {
+          const priorityCategoryIds = priorityCategories.map(cat => cat.id);
+          const priorityMenuItems = await fetchMenuItemsForCategories(RESTAURANT_ID, priorityCategoryIds);
+          
+          // Transform and display priority content immediately
+          const priorityMenu = transformFirebaseDataToMenu(priorityCategories, priorityMenuItems);
+          setMenu(priorityMenu);
+          
+          // Hide loading screen - user can now see content
           setIsLoading(false);
-        }, 1000);
+          
+          // Phase 3: Load remaining categories in background
+          loadRemainingContent();
+        } else {
+          // Fallback: if no priority categories, load all data
+          loadAllData();
+        }
+
+      } catch (error) {
+        console.error('Error loading priority data:', error);
+        // Fallback to loading all data
+        loadAllData();
       }
     };
 
-    loadFirebaseData();
+    const loadRemainingContent = async () => {
+      try {
+        setIsLoadingMore(true);
+        
+        // Load remaining categories and their menu items
+        const [remainingCategories, allMenuItems] = await Promise.all([
+          fetchRemainingCategories(RESTAURANT_ID, 2), // Skip first 2 categories
+          fetchMenuItems(RESTAURANT_ID) // Get all menu items for complete data
+        ]);
+
+        if (remainingCategories.length > 0) {
+          // Get all categories (priority + remaining)
+          const allCategories = await fetchCategories(RESTAURANT_ID);
+          const completeMenu = transformFirebaseDataToMenu(allCategories, allMenuItems);
+          setMenu(completeMenu);
+        }
+        
+        setHasMoreContent(false);
+      } catch (error) {
+        console.error('Error loading remaining content:', error);
+      } finally {
+        setIsLoadingMore(false);
+      }
+    };
+
+    const loadAllData = async () => {
+      try {
+        // Fallback: Load all data at once (original behavior)
+        const [categories, menuItems] = await Promise.all([
+          fetchCategories(RESTAURANT_ID),
+          fetchMenuItems(RESTAURANT_ID)
+        ]);
+
+        if (categories.length > 0 && menuItems.length > 0) {
+          const transformedMenu = transformFirebaseDataToMenu(categories, menuItems);
+          setMenu(transformedMenu);
+        }
+        
+        setHasMoreContent(false);
+      } catch (error) {
+        console.error('Error loading all data:', error);
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    };
+
+    loadProgressiveData();
   }, [RESTAURANT_ID]);
 
   // Create a flat list of all menu items with category info for searching
@@ -751,6 +807,16 @@ function App() {
                   />
                 )
               ))}
+              
+              {/* Loading indicator for background content */}
+              {isLoadingMore && (
+                <div className="loading-more-indicator">
+                  <div className="loading-more-content">
+                    <div className="loading-spinner-small"></div>
+                    <span>Loading more delicious items...</span>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
