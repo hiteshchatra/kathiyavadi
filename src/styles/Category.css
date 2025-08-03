@@ -92,18 +92,18 @@
   color: var(--white);
 }
 
-/* Menu Items List - Clean Grid */
+/* Menu Items List - Grid with Spacing */
 .menu-items-list {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0;
-  background: var(--white);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--gray-200);
-  overflow: hidden;
+  gap: var(--space-4);
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  overflow: visible;
 }
 
-/* Responsive Grid - Compact */
+/* Responsive Grid - With Proper Spacing */
 @media (min-width: 640px) {
   .category-title {
     font-size: 1.3rem;
@@ -115,6 +115,7 @@
   
   .menu-items-list {
     grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-5);
   }
 }
 
@@ -122,56 +123,23 @@
   .category-section {
     margin-bottom: var(--space-10);
   }
+  
+  .menu-items-list {
+    gap: var(--space-6);
+  }
 }
 
 @media (min-width: 1024px) {
   .menu-items-list {
     grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .menu-items-list > *:not(:nth-child(3n)) {
-    border-right: 1px solid var(--gray-200);
+    gap: var(--space-6);
   }
 }
 
 @media (min-width: 1280px) {
   .menu-items-list {
     grid-template-columns: repeat(4, 1fr);
-  }
-  
-  .menu-items-list > *:not(:nth-child(4n)) {
-    border-right: 1px solid var(--gray-200);
-  }
-}
-
-/* Remove conflicting borders */
-.menu-items-list > *:nth-child(odd) {
-  border-right: none;
-}
-
-@media (min-width: 640px) {
-  .menu-items-list > *:nth-child(2n-1) {
-    border-right: 1px solid var(--gray-200);
-  }
-}
-
-@media (min-width: 1024px) {
-  .menu-items-list > *:nth-child(2n-1) {
-    border-right: none;
-  }
-  
-  .menu-items-list > *:not(:nth-child(3n)) {
-    border-right: 1px solid var(--gray-200);
-  }
-}
-
-@media (min-width: 1280px) {
-  .menu-items-list > *:not(:nth-child(3n)) {
-    border-right: none;
-  }
-  
-  .menu-items-list > *:not(:nth-child(4n)) {
-    border-right: 1px solid var(--gray-200);
+    gap: var(--space-8);
   }
 }
 
@@ -219,6 +187,6 @@
   .menu-items-list {
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: var(--space-2);
   }
 }
