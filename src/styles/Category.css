@@ -139,7 +139,7 @@
 @media (min-width: 1280px) {
   .menu-items-list {
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-8);
+    gap: var(--space-4);
   }
 }
 
